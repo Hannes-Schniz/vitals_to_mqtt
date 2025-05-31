@@ -45,6 +45,7 @@ fi
 if command -v nvidia-smi >/dev/null 2>&1; then
   GPU_TEMP=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | head -n1)
   GPU_FAN_SPEED=$(nvidia-smi --query-gpu=fan.speed --format=csv,noheader,nounits | head -n1)
+  GPU_USAGE=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits)
 else
   # Try with sensors for AMD or integrated GPUs
   GPU_TEMP=$(echo "$SENSORS_JSON" | jq '..|.temp2_input? // empty' | head -n1)
@@ -76,6 +77,7 @@ PAYLOAD=$(jq -n \
   --arg cpu_fan_speed "$CPU_FAN_SPEED" \
   --arg gpu_temp "$GPU_TEMP" \
   --arg gpu_fan_speed "$GPU_FAN_SPEED" \
+  --arg gpu_usage "$GPU_USAGE" \
   --arg mem_total "$MEM_TOTAL" \
   --arg mem_used "$MEM_USED" \
   --arg mem_available "$MEM_AVAILABLE" \
