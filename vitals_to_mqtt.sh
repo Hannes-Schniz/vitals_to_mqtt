@@ -60,9 +60,9 @@ MEM_USED=$((MEM_TOTAL - MEM_AVAILABLE))
 
 # Get all mounted drives (excluding tmpfs, devtmpfs, squashfs, etc)
 DRIVES_JSON=$(df -hP -x tmpfs -x devtmpfs -x squashfs | awk 'NR>1 {print $6}' | while read mount; do
-  usage=$(df -hP "$mount" | awk 'NR==2 {print $3}')
-  avail=$(df -hP "$mount" | awk 'NR==2 {print $4}')
-  size=$(df -hP "$mount" | awk 'NR==2 {print $2}')
+  usage=$(df -hPBM "$mount" | awk 'NR==2 {print $3}')
+  avail=$(df -hPBM "$mount" | awk 'NR==2 {print $4}')
+  size=$(df -hPBM "$mount" | awk 'NR==2 {print $2}')
   printf '{"mount":"%s","used":"%s","available":"%s","size":"%s"}\n' "$mount" "$usage" "$avail" "$size"
 done | jq -s '.')
 
