@@ -7,7 +7,7 @@ HOSTNAME=$(hostname)
 DATE=$(date --iso-8601=seconds)
 TOPIC="system/vitals/$HOSTNAME"          # Replace with your desired MQTT topic
 
-SECRETS_FILE="./mqtt_secrets"
+SECRETS_FILE="/etc/mqtt_secrets"
 
 # Read username and password from secrets file
 if [[ -f "$SECRETS_FILE" ]]; then
