@@ -92,6 +92,7 @@ PAYLOAD=$(jq -n \
     gpu_temp_C: ($gpu_temp|if . == "N/A" then . else tonumber end),
     gpu_fan_speed_percent: ($gpu_fan_speed|if . == "N/A" then . else tonumber end),
     mem_total_kb: ($mem_total|tonumber),
+    gpu_usage: ($gpu_usage|if . == "N/A" then . else tonumber end),
     mem_used_kb: ($mem_used|tonumber),
     mem_available_kb: ($mem_available|tonumber),
     drives: $drives
