@@ -24,11 +24,10 @@ if [[ -z "$MQTT_USERNAME" || -z "$MQTT_PASSWORD" ]]; then
 fi
 
 UPTIME=$(awk '{print int($1)}' /proc/uptime)
-CPU_LOAD=$(awk '{print $1}' /proc/loadavg)
+CPU_LOAD=$(vmstat 1 2 | tail -1 | awk '{print 100 - $15}')
 HOSTNAME=$(hostname)
 DATE=$(date --iso-8601=seconds)
 UPTIME=$(awk '{print int($1)}' /proc/uptime)
-CPU_LOAD=$(awk '{print $1}' /proc/loadavg)
 
 # CPU Temperature(s) and Fan Speed(s) from sensors
 SENSORS_JSON=$(sensors -j 2>/dev/null)
@@ -89,7 +88,7 @@ PAYLOAD=$(jq -n \
     hostname: $hostname,
     time: $date,
     uptime_s: ($uptime|tonumber),
-    cpu_load: ($cpu_load|tonumber),
+    cpu_load: ($cpu_load),
     cpu_temp_C: ($cpu_temp|if . == "N/A" then . else tonumber end),
     cpu_fan_speed_rpm: ($cpu_fan_speed|if . == "N/A" then . else tonumber end),
     gpu_temp_C: ($gpu_temp|if . == "N/A" then . else tonumber end),
