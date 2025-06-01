@@ -2,3 +2,4 @@ mqtt_secrets
 exec.sh
 .venv
 process_dump*
+*secrets*
