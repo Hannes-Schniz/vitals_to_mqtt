@@ -11,7 +11,7 @@ source .venv/bin/activate
 pip install --upgrade pip
 
 # Install dependencies
-pip install psutil paho-mqtt
+pip install -r requirements.txt
 
 echo "Python environment setup complete."
 echo "To activate your environment, run: source .venv/bin/activate"
