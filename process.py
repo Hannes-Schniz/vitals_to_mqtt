@@ -27,12 +27,15 @@ def read_influxdb_credentials(filepath=INFLUXDB_CREDS_FILE):
 def get_processes_info():
     processes = []
     proc_objs = []
+    skipped = 0
+    num_cpus = psutil.cpu_count(logical=True)
     # First pass: collect process objects and prime cpu_percent
     for proc in psutil.process_iter(['pid', 'name', 'username', 'memory_info', 'status', 'create_time']):
         try:
             proc.cpu_percent(interval=None)
             proc_objs.append(proc)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            skipped += 1
             continue
     time.sleep(0.1)  # Wait a bit to get accurate CPU percent
 
@@ -40,14 +43,21 @@ def get_processes_info():
     for proc in proc_objs:
         try:
             info = proc.as_dict(attrs=['pid', 'name', 'username', 'memory_info', 'status', 'create_time'])
-            info['cpu_percent'] = proc.cpu_percent(interval=None)
+            # Get absolute CPU percent (relative to all CPUs)
+            cpu_percent = proc.cpu_percent(interval=None)
+            if num_cpus and num_cpus > 0:
+                cpu_percent = cpu_percent / num_cpus
+            info['cpu_percent'] = round(cpu_percent, 2)
             if info["memory_info"]:
                 info["memory_rss"] = info["memory_info"].rss
                 info["memory_vms"] = info["memory_info"].vms
                 del info["memory_info"]
             processes.append(info)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            skipped += 1
             continue
+    if skipped > 0:
+        print(f"Warning: Skipped {skipped} processes due to permission errors. Try running as root to see all processes.")
     return processes
 
 def send_to_influxdb(processes, creds, measurement="process_stats"):
