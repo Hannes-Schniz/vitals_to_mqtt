@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+sudo apt update
+
+sudo apt install python3.11-venv -y
+
+sudo apt-get install gcc python3-dev -y
+
 # Create virtual environment
 python3 -m venv .venv
 

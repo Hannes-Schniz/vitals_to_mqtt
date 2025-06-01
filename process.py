@@ -49,8 +49,9 @@ def get_processes_info():
                 cpu_percent = cpu_percent / num_cpus
             info['cpu_percent'] = round(cpu_percent, 2)
             if info["memory_info"]:
-                info["memory_rss"] = info["memory_info"].rss
-                info["memory_vms"] = info["memory_info"].vms
+                # Show RSS and VMS in rounded KB
+                info["memory_rss"] = round(info["memory_info"].rss / 1024)
+                info["memory_vms"] = round(info["memory_info"].vms / 1024)
                 del info["memory_info"]
             processes.append(info)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
@@ -75,7 +76,7 @@ def send_to_influxdb(processes, creds, measurement="process_stats"):
         fields = [
             f'cpu_percent={p.get("cpu_percent", 0)}',
             f'memory_rss={p.get("memory_rss", 0)}i',
-            f'memory_vms={p.get("memory_vms", 0)}i'
+            f'memory_vms={p.get("memory_vms", 0)}i'  # Now in KB, rounded
         ]
         line = (f'{measurement},{",".join(tags)} {",".join(fields)} {timestamp_ns}')
         lines.append(line)
@@ -98,7 +99,7 @@ def send_to_influxdb(processes, creds, measurement="process_stats"):
 def main():
     now = datetime.datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
     hostname = socket.gethostname()
-    filename = f"/tmp/process_dump_{hostname}_{now}.json"
+    filename = f"process_dump_{hostname}_{now}.json"
 
     creds = read_influxdb_credentials()
     if not creds:
