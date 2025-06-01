@@ -98,7 +98,7 @@ def send_to_influxdb(processes, creds, measurement="process_stats"):
 def main():
     now = datetime.datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
     hostname = socket.gethostname()
-    filename = f"process_dump_{hostname}_{now}.json"
+    filename = f"/tmp/process_dump_{hostname}_{now}.json"
 
     creds = read_influxdb_credentials()
     if not creds:
